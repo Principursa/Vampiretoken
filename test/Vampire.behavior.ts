@@ -1,4 +1,9 @@
 import { expect } from "chai";
+import hre from "hardhat";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/dist/src/signer-with-address";
+
+import { Signers } from "../types";
+
 import { BigNumber } from "ethers";
 
 export function shouldBehaveLikeVamp(): void {
@@ -37,6 +42,19 @@ export function shouldBehaveLikeVamp(): void {
     await this.Dummy.connect(this.signers.admin).approve(this.Vamp.address, 1000);
     await this.Vamp.connect(this.signers.admin).burnShibas(this.Dummy.address, 1000);
     expect(this.Vamp.balanceOf(this.signers.admin.address)).to.not.equal(0);
+
+    //expect(this.Dummy.allowance(this.signers.admin.address,this.Vamp.address)).to.not.equal(0)
+  });
+  it("should transfer shibas and give sender rewards if not owner", async function () {
+    await this.Vamp.AddToken(this.Dummy.address, 1);
+
+    const signers: SignerWithAddress[] = await hre.ethers.getSigners();
+
+    await this.Dummy.connect(this.signers.admin).approve(signers[1].address, 1000);
+    await this.Dummy.connect(signers[1]).transferFrom(this.signers.admin.address, signers[1].address, 1000);
+    await this.Dummy.connect(signers[1]).approve(this.Vamp.address, 1000);
+    await this.Vamp.connect(signers[1]).burnShibas(this.Dummy.address, 1000);
+    expect(this.Vamp.balanceOf(signers[1].address)).to.not.equal(0);
 
     //expect(this.Dummy.allowance(this.signers.admin.address,this.Vamp.address)).to.not.equal(0)
   });

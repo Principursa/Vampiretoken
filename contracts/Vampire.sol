@@ -10,6 +10,7 @@ import "hardhat/console.sol";
 contract Vamp is ERC20, Ownable {
     uint256 public number = 5;
     mapping(address => uint256) public Shibas;
+    address[] public shibaList;
 
     constructor() ERC20("VAMP", "Vampire") {
         console.log("Deploying Vamp contract");
@@ -22,12 +23,17 @@ contract Vamp is ERC20, Ownable {
         _;
     }
 
-    function mint(address to, uint256 amount) public onlyOwner {
+    function mint(address to, uint256 amount) private {
         _mint(to, amount);
+    }
+
+    function getListLength() public view returns (uint256 count) {
+        return shibaList.length;
     }
 
     function AddToken(address token, uint256 exchangeRate) public {
         Shibas[token] = exchangeRate;
+        shibaList.push(token);
     }
 
     function findShiba(address token) public view returns (string memory) {
